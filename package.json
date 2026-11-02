@@ -1,0 +1,31 @@
+{
+  "name": "fieldwatch-console",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "live": "live-server frontend --port=5500 --cors",
+    "check": "node --check backend/server.js && node --check frontend/app.js",
+    "security:test": "node scripts/security_tests/run_all_security_tests.cjs",
+    "security:test:static": "node scripts/security_tests/secret_scanner.cjs",
+    "security:test:api": "node scripts/security_tests/api_security_test.cjs",
+    "security:test:database": "node scripts/security_tests/database_security_test.cjs",
+    "vision": "python ai_vision/yolo_detector.py --webcam --world --conf 0.20 --interval 0.05",
+    "radar": "python hardware_iot/bridge/ultrasonic_bridge.py",
+    "start:all": "powershell -ExecutionPolicy Bypass -File scripts/start-green-eye.ps1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "mongodb": "^6.12.0",
+    "zod": "^4.6.4"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

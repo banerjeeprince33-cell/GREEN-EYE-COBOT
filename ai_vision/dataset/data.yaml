@@ -1,0 +1,13 @@
+path: c:/Users/Arkasnata/Desktop/SIH/dataset
+train: images/train
+val: images/val
+
+names:
+  0: human
+  1: lion
+  2: tiger
+  3: deer
+  4: dog
+  5: rhinoceros
+  6: leopard
+  7: monkeys

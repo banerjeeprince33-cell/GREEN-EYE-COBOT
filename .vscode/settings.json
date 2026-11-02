@@ -1,0 +1,19 @@
+{
+  "liveServer.settings.root": "/frontend",
+  "liveServer.settings.ignoreFiles": [
+    "**/data/**",
+    "**/*.json",
+    "**/*.log",
+    "**/runs/**",
+    "**/weights/**",
+    "**/*.pt",
+    "**/dataset/**",
+    "**/__pycache__/**"
+  ],
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.port": 5500,
+  "liveServer.settings.wait": 2000,
+  "fiveServer.root": "frontend",
+  "fiveServer.open": "index.html",
+  "fiveServer.port": 5500
+}

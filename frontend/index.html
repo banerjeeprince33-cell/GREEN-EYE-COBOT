@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fieldwatch | Wildlife Monitoring Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=security-v9">
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Sidebar navigation">
+      <div class="brand">
+        <span class="brand-mark">FW</span>
+        <span>FIELDWATCH</span>
+      </div>
+      <div class="workspace-switcher-wrap">
+        <button type="button" class="workspace-switcher ws-gps-button" id="workspace-station-indicator" title="Click to Calibrate Station Location &amp; Manage GPS" aria-haspopup="dialog">
+          <span class="status-dot"></span>
+          <div class="ws-button-content">
+            <div class="ws-button-title" id="workspace-location-name">GPS FIX // KOLKATA</div>
+            <div class="ws-button-coords" id="workspace-location-coords">[22.564300° N / 88.369300° E]</div>
+          </div>
+          <span class="ws-button-icon" title="Calibrate Field Location">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+          </span>
+        </button>
+
+        <!-- Location Selection & GPS Reset Dropdown Menu -->
+        <div class="workspace-location-dropdown" id="workspace-location-dropdown" style="display: none;">
+          <div class="ws-dropdown-header">
+            <span class="ws-dropdown-kicker">STATION SELECTOR &bull; GPS</span>
+            <div class="ws-current-fix">
+              <span class="pulse-dot"></span>
+              <span id="ws-dropdown-coords">Acquiring Laptop GPS...</span>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons: Fetch Exact Laptop Location & Reset GPS -->
+          <div class="ws-quick-actions">
+            <button type="button" class="ws-action-btn ws-btn-fetch" id="ws-fetch-exact-loc-btn" title="Acquire Live Laptop Location from Windows GPS &amp; Sensor">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Fetch Exact Laptop GPS</span>
+            </button>
+            <button type="button" class="ws-action-btn ws-btn-reset" id="ws-reset-gps-btn" title="Clear GPS cache, recalibrate sensor, and fetch fresh satellite fix">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <span>Reset GPS Sensor</span>
+            </button>
+          </div>
+
+          <!-- Station Presets List -->
+          <div class="ws-presets-section">
+            <span class="ws-section-label">CHOOSE FIELD LOCATION</span>
+            <div class="ws-preset-item active" data-loc="laptop" id="ws-preset-laptop">
+              <div class="ws-preset-dot"></div>
+              <div class="ws-preset-info">
+                <div class="ws-preset-title" id="ws-preset-laptop-title">💻 Laptop Native GPS (Live)</div>
+                <div class="ws-preset-sub" id="ws-preset-laptop-coords">Auto-tracking laptop hardware</div>
+              </div>
+              <span class="ws-preset-tag">ACTIVE</span>
+            </div>
+
+            <div class="ws-preset-item" data-loc="node04" data-name="Field Station Node 04" data-lat="24.861000" data-lon="88.017800">
+              <div class="ws-preset-dot node04"></div>
+              <div class="ws-preset-info">
+                <div class="ws-preset-title">🏢 Station 04 (HQ Base)</div>
+                <div class="ws-preset-sub">24.861000° N, 88.017800° E</div>
+              </div>
+            </div>
+
+            <div class="ws-preset-item" data-loc="node02" data-name="River Bend Node 02" data-lat="11.679100" data-lon="76.380200">
+              <div class="ws-preset-dot node02"></div>
+              <div class="ws-preset-info">
+                <div class="ws-preset-title">🌊 River Bend (Node 02)</div>
+                <div class="ws-preset-sub">11.679100° N, 76.380200° E</div>
+              </div>
+            </div>
+
+            <div class="ws-preset-item" data-loc="node01" data-name="East Ridge Node 01" data-lat="11.675500" data-lon="76.391400">
+              <div class="ws-preset-dot node01"></div>
+              <div class="ws-preset-info">
+                <div class="ws-preset-title">⛰️ East Ridge (Node 01)</div>
+                <div class="ws-preset-sub">11.675500° N, 76.391400° E</div>
+              </div>
+            </div>
+
+            <div class="ws-preset-item" data-loc="node03" data-name="Canopy Sector Node 03" data-lat="11.687000" data-lon="76.364800">
+              <div class="ws-preset-dot node03"></div>
+              <div class="ws-preset-info">
+                <div class="ws-preset-title">🌲 Canopy Ridge (Node 03)</div>
+                <div class="ws-preset-sub">11.687000° N, 76.364800° E</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dropdown Footer -->
+          <div class="ws-dropdown-footer">
+            <button type="button" class="ws-footer-link" id="ws-open-modal-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Custom Coordinates</span>
+            </button>
+            <a id="ws-open-gmaps-link" target="_blank" rel="noopener noreferrer" class="ws-footer-link gmaps-ext">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Google Maps</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <nav class="nav-list" aria-label="Primary navigation">
+        <a class="nav-item active" href="#overview"><span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Overview</a>
+        <a class="nav-item" href="#detections"><span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="2"/></svg></span> Detections <span
+            class="nav-count">12</span></a>
+        <a class="nav-item" href="#devices"><span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg></span> Devices</a>
+        <a class="nav-item" href="#map"><span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg></span> Field map</a>
+        <a class="nav-item" href="#ai-assistant" id="nav-ai-copilot"><span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></span> Ranger AI <span class="nav-badge-ai">PRO</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="mini-label">DATA RETENTION</div>
+        <div class="retention-row">
+          <span id="database-provider-label">Local database</span>
+          <strong id="storage-count">0 records</strong>
+        </div>
+        <div class="storage-bar"><span></span></div>
+        <a class="nav-item" href="#settings" id="sidebar-settings-btn"><span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          Settings</a>
+        <div class="profile" id="sidebar-profile">
+          <div class="avatar" id="sidebar-avatar">AB</div>
+          <div class="profile-info">
+            <strong id="sidebar-researcher-name">Arkasnata Bandyopadhyay</strong>
+            <small id="sidebar-researcher-role">Lead Field Researcher</small>
+          </div>
+          <button type="button" class="lock-btn" id="sidebar-lock-btn" title="Sign Out &amp; Lock Terminal"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow" id="realtime-header-clock">THURSDAY, 27 AUG 2026 / 09:41:08 UTC</div>
+          <h1 id="realtime-greeting">Good evening, Arkasnata <span class="sun">&#x2726;</span></h1>
+        </div>
+        <div class="top-actions">
+          <span class="sync-status"><span class="pulse-dot"></span> All systems nominal</span>
+          <span class="researcher-badge" id="topbar-badge">
+            <i class="badge-dot"></i>
+            <span id="topbar-clearance">CLEARANCE: LEVEL 3</span>
+          </span>
+
+          <div class="notif-menu-wrapper">
+            <button type="button" class="icon-button notif-button" id="notif-menu-button" title="Field Notifications & System Alerts"
+              aria-label="Field Notifications">
+              <span class="notif-bell-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
+              <span class="notif-badge-count" id="notif-badge-count">3</span>
+            </button>
+            <div class="notif-dropdown-menu" id="notif-dropdown-menu" style="display: none;">
+              <div class="notif-dropdown-header">
+                <div class="notif-header-title">
+                  <span class="pulse-dot"></span>
+                  <strong>FIELD OPERATIONS ALERTS</strong>
+                </div>
+                <button type="button" class="notif-action-btn" id="notif-clear-btn" title="Clear all alerts">Mark Read</button>
+              </div>
+              <div class="notif-list" id="notif-list">
+                <!-- Populated dynamically by app.js -->
+              </div>
+              <div class="notif-dropdown-footer">
+                <span class="notif-footer-stat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 4 Nodes Active</span>
+                <span class="notif-footer-link">Node 04 / Live Telemetry</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="user-menu-wrapper">
+            <button type="button" class="user-button" id="user-menu-button">
+              <span id="topbar-user-avatar">AB</span> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="user-dropdown-menu" id="user-dropdown-menu" style="display: none;">
+              <div class="dropdown-header">
+                <strong id="dropdown-name">Arkasnata Bandyopadhyay</strong>
+                <span id="dropdown-id">ID: #FW-842</span>
+                <small id="dropdown-station">Awaiting Location Fix</small>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item" id="topbar-settings-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Control Settings &amp; Team</span>
+              </button>
+              <button type="button" class="dropdown-item" id="lock-terminal-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Lock Terminal &amp; Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- MASTER OPERATIONAL SUBSYSTEM STATUS MATRIX -->
+      <section class="subsystem-matrix-bar" aria-label="System operational status matrix">
+        <div class="subsystem-matrix-header">
+          <span class="subsystem-matrix-title"><span class="pulse-dot"></span> SUBSYSTEM MATRIX</span>
+          <span class="subsystem-matrix-mode" id="system-operation-mode">TACTICAL MONITORING ACTIVE</span>
+        </div>
+        <div class="subsystem-chips-grid">
+          <div class="subsystem-chip" id="chip-backend" title="Express REST API &amp; SSE Gateway">
+            <span class="chip-led online" id="led-backend"></span>
+            <span class="chip-name">API GATEWAY</span>
+            <span class="chip-status online" id="status-backend">ONLINE</span>
+          </div>
+          <div class="subsystem-chip" id="chip-database" title="MongoDB Atlas / Local Fallback Store">
+            <span class="chip-led online" id="led-database"></span>
+            <span class="chip-name">DATABASE</span>
+            <span class="chip-status online" id="status-database">MONGODB</span>
+          </div>
+          <div class="subsystem-chip" id="chip-radar" title="Arduino HC-SR04 Ultrasonic 180° Sweep Station">
+            <span class="chip-led offline" id="led-radar"></span>
+            <span class="chip-name">HC-SR04 RADAR</span>
+            <span class="chip-status offline" id="status-radar">STANDBY</span>
+          </div>
+          <div class="subsystem-chip" id="chip-camera" title="ESP32-CAM WiFi Stream / Integrated Webcam">
+            <span class="chip-led connecting" id="led-camera"></span>
+            <span class="chip-name">CAMERA FEED</span>
+            <span class="chip-status connecting" id="status-camera">STANDBY</span>
+          </div>
+          <div class="subsystem-chip" id="chip-vision" title="YOLOv8 Edge Perception &amp; Wildlife Classifier">
+            <span class="chip-led online" id="led-vision"></span>
+            <span class="chip-name">YOLO VISION</span>
+            <span class="chip-status online" id="status-vision">READY</span>
+          </div>
+          <div class="subsystem-chip" id="chip-cobot" title="Green Eye GE-01 Cobot Autonomous Telemetry">
+            <span class="chip-led offline" id="led-cobot"></span>
+            <span class="chip-name">GE-01 COBOT</span>
+            <span class="chip-status offline" id="status-cobot">STANDBY</span>
+          </div>
+          <div class="subsystem-chip" id="chip-copilot" title="Ranger AI Tactical Copilot &amp; Zoological SOPs">
+            <span class="chip-led online" id="led-copilot"></span>
+            <span class="chip-name">RANGER AI</span>
+            <span class="chip-status online" id="status-copilot">READY</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero-grid">
+        <article class="camera-card panel" id="devices">
+          <div class="panel-head">
+            <div>
+              <span class="live-kicker"><span class="live-dot"></span> LIVE FEED</span>
+              <h2 id="camera-location-title" class="cam-loc-header">
+                <span>ESP32-CAM / <strong id="camera-dynamic-loc-name"
+                    class="cam-dynamic-loc-name">Acquiring Live Location...</strong></span>
+                <button type="button" class="cam-loc-edit-btn" id="cam-edit-loc-btn"
+                  title="Calibrate / Change Live Location">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>Calibrate</span>
+                </button>
+              </h2>
+            </div>
+            <div class="camera-actions">
+              <button type="button" class="ghost-button" id="laptop-camera-button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                <span>Use laptop webcam</span>
+              </button>
+              <button type="button" class="ghost-button" id="toggle-predator-alarm" title="Toggle Ferocious Animal Alarm Siren">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="siren-icon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                <span>Siren: ON</span>
+              </button>
+              <button type="button" class="ghost-button" id="refresh-feed">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="camera-view">
+            <div class="forest-art">
+              <div class="mist mist-one"></div>
+              <div class="mist mist-two"></div>
+              <div class="tree tree-left"></div>
+              <div class="tree tree-right"></div>
+              <div class="animal-silhouette">&#x265E;</div>
+              <div class="camera-crosshair"></div>
+              <span class="cam-time" id="realtime-cam-clock">09:41:08</span>
+              <span class="cam-meta" id="camera-overlay-meta">CAM-04 / 1080P / SECURE</span>
+            </div>
+            <div class="scan-badge"><span class="pulse-dot"></span> Scanning</div>
+          </div>
+          <div class="camera-footer">
+            <div class="device-stat">
+              <span>Signal</span>
+              <strong class="signal">Excellent</strong>
+            </div>
+            <div class="device-stat">
+              <span>Battery</span>
+              <strong>87%</strong>
+            </div>
+            <div class="device-stat">
+              <span>Last frame</span>
+              <strong>12 sec ago</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="radar-card panel">
+          <div class="panel-head radar-head">
+            <div>
+              <span class="radar-kicker"><span class="radar-kicker-dot"></span> ARDUINO HC-SR04 // 180&deg; POLAR
+                RADAR</span>
+              <h2>Ultrasonic Radar Station</h2>
+            </div>
+            <div class="radar-actions">
+              <button type="button" class="ghost-button radar-action-btn" id="connect-serial-btn"
+                title="Connect Arduino Uno/Nano via browser Web Serial USB">
+                <span class="radar-btn-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18 8v4a6 6 0 0 1-12 0V8"/><path d="M4 4h4v4H4z"/><path d="M16 4h4v4h-4z"/><path d="M12 18v4"/></svg></span> <span>Connect USB Serial</span>
+              </button>
+              <select class="radar-select" id="radar-baud-select" title="Arduino Serial Baud Rate">
+                <option value="115200" selected>115200 baud</option>
+                <option value="9600">9600 baud</option>
+              </select>
+              <select class="radar-select" id="radar-range-select" title="Max Detection Range">
+                <option value="40" selected>Max 40 cm</option>
+                <option value="100">Max 100 cm</option>
+                <option value="200">Max 200 cm</option>
+                <option value="400">Max 400 cm</option>
+              </select>
+              <span class="online-pill" id="radar-status-pill">STANDBY</span>
+            </div>
+          </div>
+
+          <div class="radar-body-grid">
+            <div class="radar-canvas-container" id="radar-canvas-wrap">
+              <canvas id="radar-canvas" width="480" height="260"></canvas>
+              <div class="radar-overlay-banner" id="radar-overlay-banner">
+                <div class="radar-watermark">ARDUINO RADAR</div>
+              </div>
+            </div>
+
+            <div class="radar-side-panel">
+              <div class="radar-reading-grid">
+                <div class="radar-stat-box">
+                  <span>SERVO / SENSOR ANGLE</span>
+                  <strong id="radar-angle-label">--&deg;</strong>
+                </div>
+                <div class="radar-stat-box">
+                  <span>TARGET DISTANCE</span>
+                  <strong id="distance-reading">-- cm</strong>
+                </div>
+                <div class="radar-stat-box">
+                  <span>RANGE SCALE</span>
+                  <strong id="max-range-display">40 cm</strong>
+                </div>
+                <div class="radar-stat-box">
+                  <span>DETECTION STATUS</span>
+                  <strong id="radar-target-status" class="status-clear">NO SENSOR</strong>
+                </div>
+              </div>
+
+              <div class="radar-foot">
+                <div class="radar-foot-left">
+                  <span class="pulse-dot" id="radar-foot-pulse"></span>
+                  <span id="radar-source-label">Awaiting Arduino Serial / Python Bridge</span>
+                </div>
+                <div class="radar-foot-right">
+                  <span class="mono" id="radar-ping">STREAM READY</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="cobot-section" id="robot-control">
+        <article class="panel mission-panel">
+          <div class="panel-head">
+            <div>
+              <span class="section-kicker">GREEN EYE COBOT</span>
+              <h2>Autonomous mission control</h2>
+            </div>
+            <span class="mission-pill offline" id="mission-status">STANDBY</span>
+          </div>
+          <div class="mission-grid">
+            <div class="mission-map">
+              <div class="mission-route"></div>
+              <div class="robot-marker" id="robot-marker">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>
+              </div>
+              <span class="route-label start-label">BASE</span>
+              <span class="route-label scan-label">SCAN ZONE</span>
+              <span class="route-label goal-label">PATROL SECTOR</span>
+            </div>
+            <div class="mission-controls">
+              <div class="control-row">
+                <span><b class="control-led dim" id="nav-led"></b>Navigation</span>
+                <strong id="navigation-state">Awaiting connection</strong>
+              </div>
+              <div class="control-row">
+                <span><b class="control-led dim" id="obstacle-led"></b>Obstacle avoidance</span>
+                <strong id="obstacle-state">No sensor feed</strong>
+              </div>
+              <div class="control-row">
+                <span><b class="control-led dim" id="servo-led"></b>Camera servo</span>
+                <strong id="servo-state">--&deg; / Offline</strong>
+              </div>
+              <div class="control-row">
+                <span><b class="control-led blue"></b>YOLO model</span>
+                <strong>v8-wildlife / Ready</strong>
+              </div>
+              <div class="mission-actions">
+                <button type="button" class="primary-button" id="autonomy-button">Pause autonomy</button>
+                <button type="button" class="ghost-button" id="obstacle-button">Simulate obstacle</button>
+              </div>
+
+              <!-- Manual Motor Teleoperation Drive Deck -->
+              <div class="teleop-deck" id="teleop-deck">
+                <div class="teleop-header">
+                  <span><b class="control-led dim" id="teleop-led"></b>MANUAL TELEOP</span>
+                  <span class="teleop-key-hint">WASD / ARROWS</span>
+                </div>
+                <div class="teleop-pad">
+                  <div class="teleop-row">
+                    <button type="button" class="teleop-btn" id="motor-fwd" title="Forward (W / Up Arrow)" aria-label="Drive Forward">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                    </button>
+                  </div>
+                  <div class="teleop-row middle">
+                    <button type="button" class="teleop-btn" id="motor-left" title="Pivot Left (A / Left Arrow)" aria-label="Pivot Left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <button type="button" class="teleop-btn stop-btn" id="motor-stop" title="Halt / Emergency Stop (Space)" aria-label="Emergency Stop">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                    </button>
+                    <button type="button" class="teleop-btn" id="motor-right" title="Pivot Right (D / Right Arrow)" aria-label="Pivot Right">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                  </div>
+                  <div class="teleop-row">
+                    <button type="button" class="teleop-btn" id="motor-rev" title="Reverse (S / Down Arrow)" aria-label="Drive Reverse">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="teleop-status-strip">
+                  <span>COMMAND: <strong id="teleop-last-cmd">HALT</strong></span>
+                  <span id="teleop-mode-indicator">AUTO ACTIVE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="workflow-strip">
+            <span class="workflow-active">MOVE</span><i>&rarr;</i>
+            <span>AVOID</span><i>&rarr;</i>
+            <span>SCAN</span><i>&rarr;</i>
+            <span>IDENTIFY</span><i>&rarr;</i>
+            <span>TRANSMIT</span>
+            <b id="mqtt-status-strip" class="offline"><span class="pulse-dot"></span> Awaiting bot</b>
+          </div>
+        </article>
+
+        <aside class="panel telemetry-panel" aria-label="Robot telemetry panel">
+          <div class="panel-head">
+            <div>
+              <span class="section-kicker">ROBOT TELEMETRY</span>
+              <h2>Green Eye / GE-01</h2>
+            </div>
+            <span class="online-pill offline" id="telemetry-online-pill">DISCONNECTED</span>
+          </div>
+          <div class="telemetry-list">
+            <div><span>Speed</span><strong id="speed-reading">-- m/s</strong></div>
+            <div><span>Heading</span><strong id="heading-reading">--&deg;</strong></div>
+            <div><span>Servo sweep</span><strong id="servo-sweep-reading">--&deg; range</strong></div>
+            <div><span>Ultrasonic</span><strong id="ultrasonic-reading">HC-SR04 / Offline</strong></div>
+            <div><span>Link state</span><strong id="telemetry-link-state">RF / LoRa Active</strong></div>
+            <div><span>Payload queue</span><strong id="payload-queue-reading">0 pending</strong></div>
+          </div>
+          <div class="telemetry-footer">
+            <span>Uptime <b id="telemetry-uptime">--:--:--</b></span>
+            <span>Firmware <b id="telemetry-firmware">--</b></span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="metric-row">
+        <div class="metric">
+          <div class="metric-icon coral">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div>
+            <span>Detections today</span>
+            <strong id="today-count">--</strong>
+            <small id="today-trend" class="up">&uarr; 0 today</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon mint">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <span>Species identified</span>
+            <strong id="species-count">--</strong>
+            <small class="muted" id="species-target-label">unique species logged</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <span>Avg. response time</span>
+            <strong id="response-time-stat">-- <b>ms</b></strong>
+            <small class="up" id="response-time-sub">sensor latency</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-grid" id="detections">
+        <article class="panel detections-panel">
+          <div class="panel-head table-head">
+            <div>
+              <span class="section-kicker">FIELD LOG</span>
+              <h2>Recent detections</h2>
+            </div>
+            <div class="table-tools">
+              <button type="button" class="filter-button" id="filter-button">
+                <span>All species</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <button type="button" class="outline-button" id="test-detection-button"
+                title="Log a sample wildlife record to database">Log sample record</button>
+              <button type="button" class="outline-button" id="export-button">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ANIMAL / SENSOR</th>
+                  <th>LOCATION</th>
+                  <th>DISTANCE &amp; ANGLE</th>
+                  <th>COORDINATES</th>
+                  <th>DATE &amp; TIME</th>
+                  <th>CONFIDENCE</th>
+                </tr>
+              </thead>
+              <tbody id="detections-body"></tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span id="showing-count">Showing 5 of 12 detections</span>
+            <div class="pagination">
+              <button type="button" disabled>&larr;</button>
+              <button type="button" class="page-active">1</button>
+              <button type="button">2</button>
+              <button type="button">3</button>
+              <button type="button">&rarr;</button>
+            </div>
+          </div>
+        </article>
+
+        <aside class="panel map-panel" id="map" aria-label="Field map panel">
+          <div class="panel-head">
+            <div>
+              <span class="section-kicker">TACTICAL FIELD MAP &bull; GPS TELEMETRY</span>
+              <h2 id="map-heading-title">Sensor locations</h2>
+            </div>
+            <div class="map-view-switcher" role="tablist" aria-label="Map view mode">
+              <button type="button" class="map-mode-btn active" id="map-tab-hud" title="Cyber HUD Vector Map">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                <span>HUD</span>
+              </button>
+              <button type="button" class="map-mode-btn" id="map-tab-gmaps" title="Google Maps Live Satellite View">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+                <span>Google Maps</span>
+              </button>
+              <button type="button" class="map-mode-btn" id="map-tab-osm" title="OpenStreetMap Street View">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                <span>OSM</span>
+              </button>
+              <button type="button" class="map-mode-btn icon-only" id="map-calibrate-btn" title="Calibrate / Manage Laptop GPS">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="map-visual-container">
+            <!-- Cyber HUD Vector Map View -->
+            <div class="map-visual" id="map-visual-hud">
+              <div class="contour contour-one"></div>
+              <div class="contour contour-two"></div>
+              <div class="contour contour-three"></div>
+              <div class="map-road road-one"></div>
+              <div class="map-road road-two"></div>
+              <div class="map-radar-sweep"></div>
+              <div class="map-pin pin-one" id="pin-kolkata" title="Field Station (Laptop GPS)">
+                <span>04</span>
+              </div>
+              <div class="map-pin pin-two" id="pin-river" title="River Bend (Node 02)">
+                <span>02</span>
+              </div>
+              <div class="map-pin pin-three" id="pin-ridge" title="East Ridge (Node 01)">
+                <span>01</span>
+              </div>
+              <div class="map-label map-label-one" id="map-hud-label-station">Station 04 (Laptop GPS)</div>
+              <div class="map-label map-label-two">River bend node</div>
+              <div class="map-hud-overlay-badge">
+                <span class="pulse-dot"></span>
+                <span id="map-hud-source-text">LAT/LON SCANNING...</span>
+              </div>
+            </div>
+
+            <!-- Google Maps Live Satellite View Iframe Container -->
+            <div class="map-visual-iframe-wrap" id="map-visual-gmaps" style="display: none;">
+              <iframe id="gmaps-satellite-frame" title="Google Maps Satellite Live Location" src="about:blank" loading="lazy" referrerpolicy="no-referrer"></iframe>
+              <div class="map-iframe-hud-tag">
+                <span class="pulse-dot"></span>
+                <span>GOOGLE MAPS SATELLITE (LIVE PIN)</span>
+              </div>
+            </div>
+
+            <!-- OpenStreetMap Standard View Iframe Container -->
+            <div class="map-visual-iframe-wrap" id="map-visual-osm" style="display: none;">
+              <iframe id="osm-map-frame" title="OpenStreetMap Live Station Location" src="about:blank" loading="lazy"></iframe>
+              <div class="map-iframe-hud-tag">
+                <span class="pulse-dot"></span>
+                <span>OPENSTREETMAP GLOBAL (NODE 04)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Telemetry & Coordinates Card -->
+          <div class="map-telemetry-card">
+            <div class="telemetry-row main-coords">
+              <div class="coord-block">
+                <span class="coord-label">EXACT COORDINATES</span>
+                <div class="coord-display-group">
+                  <strong class="coord-value" id="map-live-coordinates">Acquiring Laptop GPS...</strong>
+                  <button type="button" class="copy-coord-btn" id="copy-coordinates-btn" title="Copy GPS Coordinates to Clipboard">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+              <div class="accuracy-block">
+                <span class="coord-label">ACCURACY &bull; ALTITUDE</span>
+                <span class="accuracy-badge" id="map-live-accuracy">Determining precision...</span>
+              </div>
+            </div>
+
+            <div class="telemetry-row place-row">
+              <div class="place-block">
+                <span class="coord-label">RESOLVED LOCATION (REVERSE GEOCODE)</span>
+                <strong class="place-name" id="map-live-address">Locating nearby landmarks...</strong>
+              </div>
+              <div class="source-block">
+                <span class="coord-label">SENSOR SOURCE</span>
+                <span class="source-tag" id="map-live-source">● LAPTOP GPS</span>
+              </div>
+            </div>
+
+            <div class="map-actions-bar">
+              <a id="google-maps-location-link" class="map-action-btn primary-map-link" target="_blank" rel="noopener noreferrer" aria-disabled="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="google-maps-link-text">Open in Google Maps (Satellite)</span>
+              </a>
+              <a id="google-maps-directions-link" class="map-action-btn secondary-map-link" target="_blank" rel="noopener noreferrer" aria-disabled="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                <span>Directions</span>
+              </a>
+              <button type="button" class="map-action-btn config-map-btn" id="trigger-calibrate-modal-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Calibrate</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <footer class="page-footer">
+        <span>FIELDWATCH OS v2.4.1</span>
+        <span>Last database sync <strong id="last-sync">just now</strong></span>
+        <span><i class="footer-dot"></i> 4 / 4 nodes connected</span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- FIELD RESEARCHER AUTHENTICATION & ACCESS PORTAL -->
+  <div class="auth-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="auth-glass-card">
+      <div class="auth-header">
+        <div class="auth-badge-icon">
+          <span class="auth-brand-mark">FW</span>
+          <div class="auth-pulse-ring"></div>
+        </div>
+        <div class="auth-kicker">SECURE TERMINAL // CLEARANCE LEVEL 3</div>
+        <h2 id="auth-title">Field Researcher Login</h2>
+        <p class="auth-subtitle">Authorized personnel only. Access encrypted wildlife telemetry, live sensor nodes, and
+          real-time detection databases.</p>
+      </div>
+
+      <form class="auth-form" id="auth-form">
+        <div class="auth-security-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Salted PBKDF2 &bull; HMAC-SHA256 &bull; Anti-Brute-Force Guard</span>
+        </div>
+
+        <div class="auth-error-banner" id="auth-error" role="alert" style="display: none;"></div>
+        <div class="auth-lockout-banner" id="auth-lockout" role="alert" style="display: none;"></div>
+
+        <div class="auth-input-group">
+          <label for="researcher-id">RESEARCHER ID OR EMAIL</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <input type="text" id="researcher-id" placeholder="e.g. arkasnata@fieldwatch.org or FW-842" required
+              autocomplete="username">
+          </div>
+        </div>
+
+        <div class="auth-input-group">
+          <label for="researcher-pass">SECURITY PASSCODE</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input type="password" id="researcher-pass" placeholder="Enter encrypted passcode" required autocomplete="current-password">
+            <button type="button" class="auth-toggle-pass" id="toggle-pass"
+              title="Toggle password visibility">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-options">
+          <label class="auth-remember">
+            <input type="checkbox" id="auth-remember" checked>
+            <span>Maintain active session</span>
+          </label>
+          <span class="auth-station-badge"><i class="badge-dot"></i> Node 04 / Live</span>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" id="auth-submit-btn">
+          <span>Authenticate &amp; Unlock Terminal</span>
+          <i>&rarr;</i>
+        </button>
+
+        <div class="auth-divider">
+          <span>OR QUICK RESEARCHER ACCESS</span>
+        </div>
+
+        <button type="button" class="auth-quick-btn" id="quick-login-lead">
+          <span class="quick-avatar">AB</span>
+          <span class="quick-info">
+            <strong>Arkasnata Bandyopadhyay</strong>
+            <small>Lead Field Researcher &bull; ID #FW-842</small>
+          </span>
+          <span class="quick-arrow">&rarr;</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <span>FIELDWATCH 256-BIT ENCRYPTED</span>
+        <span>STATION: KOLKATA WEST BENGAL</span>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- LIQUID GLASS SYSTEM SETTINGS & RESEARCH TEAM MODAL -->
+  <div class="auth-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="auth-glass-card settings-card">
+      <button type="button" class="modal-close-btn" id="close-settings-modal-btn"
+        aria-label="Close Settings">&times;</button>
+
+      <div class="auth-header">
+        <div class="auth-badge-icon">
+          <span class="auth-brand-mark settings-brand-mark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          </span>
+          <div class="auth-pulse-ring settings-pulse-ring"></div>
+        </div>
+        <div class="auth-kicker">FIELDWATCH OS // SYSTEM CONFIGURATION</div>
+        <h2 id="settings-title">Fieldwatch Control Settings</h2>
+        <p class="auth-subtitle">Configure real-time AI perception models, hardware telemetry, database
+          storage, and view project engineering team credentials.</p>
+      </div>
+
+      <!-- Settings Navigation Tabs -->
+      <div class="settings-tabs-nav">
+        <button type="button" class="settings-tab-btn active" data-tab="tab-team">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Research Team</span>
+        </button>
+        <button type="button" class="settings-tab-btn" data-tab="tab-ai">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <span>AI Perception</span>
+        </button>
+        <button type="button" class="settings-tab-btn" data-tab="tab-radar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19.1"/></svg>
+          <span>Radar &amp; IoT</span>
+        </button>
+
+        <button type="button" class="settings-tab-btn" data-tab="tab-db">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <span>Database &amp; Logs</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Research Team -->
+      <div class="settings-tab-pane active" id="tab-team">
+        <div class="settings-section-title">
+          <span>PROJECT ARCHITECTS &amp; RESEARCH ADVISORY</span>
+          <small>Smart India Hackathon // Wildlife IoT &amp; AI Early Warning System</small>
+        </div>
+
+        <div class="team-grid">
+          <!-- Dr. Susmita Das -->
+          <div class="team-card mentor-card">
+            <div class="team-card-badge">PROJECT MENTOR</div>
+            <div class="team-avatar mentor-avatar">SD</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/dr-susmita-das-659ab253" target="_blank" rel="noopener noreferrer"
+                  class="team-name-link" title="Open Dr. Susmita Das on LinkedIn">
+                  Dr. Susmita Das <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">Faculty Mentor &amp; Principal Research Advisor</p>
+              <div class="team-tags">
+                <span class="team-tag">Machine Learning</span>
+                <span class="team-tag">Edge Computing</span>
+                <span class="team-tag">Biometrics</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>ADVISORY ACTIVE</span>
+            </div>
+          </div>
+
+          <!-- Arkasnata Bandyopadhyay -->
+          <div class="team-card">
+            <div class="team-card-badge lead-badge">TEAM LEAD</div>
+            <div class="team-avatar lead-avatar">AB</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/arkasnata-bandyopadhyay-b32425320" target="_blank"
+                  rel="noopener noreferrer" class="team-name-link" title="Open Arkasnata Bandyopadhyay on LinkedIn">
+                  Arkasnata Bandyopadhyay <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">System Architect &amp; AI Sensor Fusion Lead</p>
+              <div class="team-tags">
+                <span class="team-tag">YOLOv8 / Vision AI</span>
+                <span class="team-tag">Sensor Fusion</span>
+                <span class="team-tag">Full-Stack OS</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>CLEARANCE: LVL 3</span>
+            </div>
+          </div>
+
+          <!-- Avirup Mukherjee -->
+          <div class="team-card">
+            <div class="team-card-badge">HARDWARE LEAD</div>
+            <div class="team-avatar hw-avatar">AM</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/avirup-mukherjee-161741241" target="_blank"
+                  rel="noopener noreferrer" class="team-name-link" title="Open Avirup Mukherjee on LinkedIn">
+                  Avirup Mukherjee <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">IoT Hardware &amp; Embedded Systems Engineer</p>
+              <div class="team-tags">
+                <span class="team-tag">Arduino HC-SR04</span>
+                <span class="team-tag">Serial Bridge</span>
+                <span class="team-tag">Micro-ROS</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>HARDWARE READY</span>
+            </div>
+          </div>
+
+          <!-- Alin Sen -->
+          <div class="team-card">
+            <div class="team-card-badge software-badge">SOFTWARE LEAD</div>
+            <div class="team-avatar cloud-avatar">AS</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/alin-sen-6047ab31b" target="_blank" rel="noopener noreferrer"
+                  class="team-name-link" title="Open Alin Sen on LinkedIn">
+                  Alin Sen <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">Software Lead &amp; Cloud Systems Architect</p>
+              <div class="team-tags">
+                <span class="team-tag">Software Lead</span>
+                <span class="team-tag">Node.js / Express</span>
+                <span class="team-tag">MongoDB Atlas</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>SOFTWARE ACTIVE</span>
+            </div>
+          </div>
+
+          <!-- Prasun Kumar Shaw -->
+          <div class="team-card">
+            <div class="team-card-badge data-analyst-badge">DATA ANALYST</div>
+            <div class="team-avatar db-avatar">PS</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/prashun-kumar-shaw-5044b0389" target="_blank"
+                  rel="noopener noreferrer" class="team-name-link" title="Open Prasun Kumar Shaw on LinkedIn">
+                  Prasun Kumar Shaw <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">Data Analyst</p>
+              <div class="team-tags">
+                <span class="team-tag">Data Analytics</span>
+                <span class="team-tag">MongoDB Logs</span>
+                <span class="team-tag">Telemetry Data</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>ANALYTICS ACTIVE</span>
+            </div>
+          </div>
+
+          <!-- Sanskriti Gupta -->
+          <div class="team-card">
+            <div class="team-card-badge analyst-badge">RESEARCH &amp; DOC ANALYST</div>
+            <div class="team-avatar analyst-avatar">SG</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/sanskriti-gupta-7779a1303?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_android" target="_blank"
+                  rel="noopener noreferrer" class="team-name-link" title="Open Sanskriti Gupta on LinkedIn">
+                  Sanskriti Gupta <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">Research &amp; Documentary Analyst</p>
+              <div class="team-tags">
+                <span class="team-tag">Field Research</span>
+                <span class="team-tag">Doc Analytics</span>
+                <span class="team-tag">Species Intel</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>RESEARCH ACTIVE</span>
+            </div>
+          </div>
+
+          <!-- Ayitri Dhar -->
+          <div class="team-card">
+            <div class="team-card-badge rd-badge">R &amp; D</div>
+            <div class="team-avatar rd-avatar">AD</div>
+            <div class="team-info">
+              <h3>
+                <a href="https://www.linkedin.com/in/ayitri-dhar-234140329?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_android" target="_blank"
+                  rel="noopener noreferrer" class="team-name-link" title="Open Ayitri Dhar on LinkedIn">
+                  Ayitri Dhar <span class="linkedin-pill">in ↗</span>
+                </a>
+              </h3>
+              <p class="team-role">Research &amp; Development (R&amp;D)</p>
+              <div class="team-tags">
+                <span class="team-tag">R&amp;D Strategy</span>
+                <span class="team-tag">Field Prototyping</span>
+                <span class="team-tag">Bio-Telemetry</span>
+              </div>
+            </div>
+            <div class="team-status-indicator">
+              <span class="pulse-dot active"></span> <span>R&amp;D ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: AI Perception -->
+      <div class="settings-tab-pane" id="tab-ai">
+        <div class="setting-group">
+          <label>DETECTION ENGINE MODEL</label>
+          <div class="settings-radio-grid">
+            <label class="settings-radio-card">
+              <input type="radio" name="ai-engine" value="browser" checked id="engine-browser">
+              <span class="radio-content">
+                <strong>TensorFlow.js COCO-SSD (Browser)</strong>
+                <small>High-speed in-browser edge detection running directly on webcam.</small>
+              </span>
+            </label>
+            <label class="settings-radio-card">
+              <input type="radio" name="ai-engine" value="yolo" id="engine-yolo">
+              <span class="radio-content">
+                <strong>YOLOv8 Wildlife Server (Python)</strong>
+                <small>Multi-species object detection streaming on port 5001.</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-header-with-value">
+            <label for="setting-confidence-slider">CONFIDENCE THRESHOLD SENSITIVITY</label>
+            <strong id="setting-confidence-label">70%</strong>
+          </div>
+          <input type="range" id="setting-confidence-slider" min="50" max="95" value="70" class="liquid-slider">
+          <div class="slider-ticks">
+            <span>50% (High Recall)</span>
+            <span>70% (Balanced)</span>
+            <span>95% (High Precision)</span>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label>ACTIVE SPECIES DETECTION ALERTS</label>
+          <div class="settings-checkbox-list">
+            <label class="settings-checkbox-row">
+              <input type="checkbox" id="alert-predators" checked>
+              <span>Predator Alerts (Tigers, Leopards, Bears)</span>
+            </label>
+            <label class="settings-checkbox-row">
+              <input type="checkbox" id="alert-herbivores" checked>
+              <span>Corridor Wildlife (Elephants, Deer, Rhinos)</span>
+            </label>
+            <label class="settings-checkbox-row">
+              <input type="checkbox" id="alert-humans" checked>
+              <span>Human Intrusion &amp; Anti-Poaching Alerts</span>
+            </label>
+            <label class="settings-checkbox-row">
+              <input type="checkbox" id="alert-siren" checked>
+              <span>Fullscreen Visual Alarm &amp; Audio Chime</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Radar & IoT -->
+      <div class="settings-tab-pane" id="tab-radar">
+        <div class="setting-group">
+          <label>DEFAULT ARDUINO SERIAL BAUD RATE</label>
+          <select class="settings-select" id="setting-default-baud">
+            <option value="115200" selected>115200 baud (Recommended High Speed)</option>
+            <option value="9600">9600 baud (Standard Arduino Uno)</option>
+          </select>
+        </div>
+
+        <div class="setting-group">
+          <label>DEFAULT RADAR SWEEP RANGE</label>
+          <select class="settings-select" id="setting-default-range">
+            <option value="40" selected>Max 40 cm (Near Field Zone)</option>
+            <option value="100">Max 100 cm (Medium Range)</option>
+            <option value="200">Max 200 cm (Wide Field 2m)</option>
+            <option value="400">Max 400 cm (Full Sensor Range 4m)</option>
+          </select>
+        </div>
+
+        <div class="setting-group">
+          <label>SENSOR SIGNAL PROCESSING</label>
+          <div class="settings-checkbox-list">
+            <label class="settings-checkbox-row">
+              <input type="checkbox" id="setting-median-filter" checked>
+              <span>3-Sample Rolling Median Distance Filter (Eliminates acoustic spike noise)</span>
+            </label>
+            <label class="settings-checkbox-row">
+              <input type="checkbox" id="setting-auto-serial">
+              <span>Auto-Prompt USB Serial on Page Startup</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Tab 5: Database & Logs -->
+      <div class="settings-tab-pane" id="tab-db">
+        <div class="db-status-banner">
+          <div class="db-status-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <div class="db-status-info">
+            <strong>Dual Storage Engine Active</strong>
+            <small>Local Storage: <span id="settings-db-count">0</span> detections &bull; MongoDB Atlas Cloud
+              Synced</small>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label>DATA PURGE &amp; RESET</label>
+          <p class="setting-subtext">Clear out previous test logs or historical entries (e.g. from earlier testing
+            sessions) with a single click.</p>
+          <button type="button" class="db-danger-btn" id="purge-detections-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            <span>Purge &amp; Reset Detection History</span>
+          </button>
+        </div>
+
+        <div class="setting-group">
+          <label>OFFLINE EXPORT &amp; BACKUP</label>
+          <div class="export-btn-grid">
+            <button type="button" class="export-btn" id="settings-export-csv">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="10" x2="14" y1="13" y2="13"/><line x1="10" x2="14" y1="17" y2="17"/></svg>
+              <span>Export Log as CSV</span>
+            </button>
+            <button type="button" class="export-btn" id="settings-export-json">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect width="22" height="5" x="1" y="3"/><line x1="10" x2="14" y1="12" y2="12"/></svg>
+              <span>Export Full Database (JSON)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="settings-modal-footer">
+        <button type="button" class="ghost-button" id="reset-settings-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <span>Reset Defaults</span>
+        </button>
+        <button type="button" class="primary-button" id="save-settings-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Save &amp; Apply Settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALIBRATE FIELD LOCATION TELEMETRY MODAL -->
+  <div class="auth-overlay modal-overlay" id="location-modal" role="dialog" aria-modal="true" aria-labelledby="loc-modal-title">
+    <div class="loc-calibrate-modal">
+      <button type="button" class="loc-modal-x-btn" id="loc-modal-close" aria-label="Close modal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="loc-modal-hero">
+        <div class="loc-hero-compass-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        </div>
+        <div class="loc-hero-kicker">TELEMETRY // STATION POSITIONING</div>
+        <h2 id="loc-modal-title" class="loc-hero-title">Calibrate Field Location</h2>
+        <p class="loc-hero-desc">Search any city, town, wildlife sanctuary, or PIN code, enter exact coordinates, or sync high-precision satellite GPS.</p>
+      </div>
+
+      <div class="loc-modal-scrollable">
+        <!-- 1. Current Active Station Box -->
+        <div class="loc-active-station-box">
+          <div class="loc-active-station-header">
+            <div class="loc-active-pill">
+              <span class="pulse-dot"></span>
+              <span>CURRENT ACTIVE STATION</span>
+            </div>
+            <button type="button" class="loc-active-reset-btn" id="loc-mini-reset-btn" title="Reset GPS Cache">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <span>Reset GPS</span>
+            </button>
+          </div>
+          <div class="loc-active-name" id="loc-active-station-title">Kolkata (Source: Field Station GPS)</div>
+          <div class="loc-active-coords" id="loc-active-station-coords">22.564300° N, 88.369300° E (Accuracy ±15m, Alt: 12 m MSL)</div>
+        </div>
+
+        <!-- 2. Search City, Town, Sanctuary or Pincode -->
+        <div class="loc-section-block">
+          <label class="loc-block-label" for="loc-search-input">SEARCH CITY, TOWN, SANCTUARY OR PINCODE</label>
+          <div class="loc-search-row">
+            <div class="loc-search-input-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="loc-search-input" placeholder="e.g. Kolkata, Salt Lake, Delhi, Mumbai, Bengaluru, Sundarbans, 700091..." autocomplete="off">
+            </div>
+            <button type="button" class="loc-search-submit-btn" id="loc-search-btn">Search</button>
+          </div>
+          <div id="loc-search-results" class="loc-search-results-list" style="display: none;"></div>
+        </div>
+
+        <!-- 3. Two Big Action Buttons -->
+        <div class="loc-big-actions-row">
+          <button type="button" class="loc-big-btn loc-btn-fetch" id="loc-main-fetch-btn">
+            <div class="loc-big-btn-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            </div>
+            <div class="loc-big-btn-text">
+              <strong>Fetch Exact Satellite GPS</strong>
+              <small>Hardware device GPS sensor lock</small>
+            </div>
+          </button>
+
+          <button type="button" class="loc-big-btn loc-btn-reset" id="loc-main-reset-btn">
+            <div class="loc-big-btn-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </div>
+            <div class="loc-big-btn-text">
+              <strong>Reset GPS &amp; Clear Cache</strong>
+              <small>Clear wrong fix &amp; reset to default</small>
+            </div>
+          </button>
+        </div>
+
+        <!-- 4. Quick Localities & Wildlife Field Hubs Grid -->
+        <div class="loc-section-block">
+          <label class="loc-block-label">QUICK LOCALITIES &amp; WILDLIFE FIELD HUBS (1-CLICK)</label>
+          <div class="loc-hubs-grid">
+            <button type="button" class="loc-hub-pill" data-city="Kolkata Central" data-lat="22.5726" data-lon="88.3639">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Kolkata Central</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Salt Lake" data-lat="22.5867" data-lon="88.4178">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Salt Lake</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Newtown" data-lat="22.5898" data-lon="88.4744">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Newtown</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Howrah" data-lat="22.5958" data-lon="88.2636">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Howrah</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Delhi NCR" data-lat="28.6139" data-lon="77.2090">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Delhi NCR</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Mumbai" data-lat="19.0760" data-lon="72.8777">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Mumbai</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Bengaluru" data-lat="12.9716" data-lon="77.5946">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Bengaluru</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Chennai" data-lat="13.0827" data-lon="80.2707">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Chennai</span>
+            </button>
+            <button type="button" class="loc-hub-pill" data-city="Hyderabad" data-lat="17.3850" data-lon="78.4867">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Hyderabad</span>
+            </button>
+            <button type="button" class="loc-hub-pill reserve-pill" data-city="Sundarbans Reserve" data-lat="21.9497" data-lon="89.1833">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22"/></svg>
+              <span>Sundarbans Reserve</span>
+            </button>
+            <button type="button" class="loc-hub-pill reserve-pill" data-city="Kaziranga Park" data-lat="26.5775" data-lon="93.1711">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22"/></svg>
+              <span>Kaziranga Park</span>
+            </button>
+            <button type="button" class="loc-hub-pill reserve-pill" data-city="Jaldapara Sanctuary" data-lat="26.6872" data-lon="89.2872">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22"/></svg>
+              <span>Jaldapara Sanctuary</span>
+            </button>
+            <button type="button" class="loc-hub-pill reserve-pill" data-city="Jim Corbett" data-lat="29.5300" data-lon="78.7747">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22"/></svg>
+              <span>Jim Corbett</span>
+            </button>
+            <button type="button" class="loc-hub-pill reserve-pill" data-city="Gir Sanctuary" data-lat="21.1243" data-lon="70.8242">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22"/></svg>
+              <span>Gir Sanctuary</span>
+            </button>
+            <button type="button" class="loc-hub-pill reserve-pill" data-city="Western Ghats" data-lat="11.6824" data-lon="76.3721">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22"/></svg>
+              <span>Western Ghats</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Manual Decimal Coordinate Override Accordion -->
+        <details class="loc-manual-accordion">
+          <summary class="loc-manual-summary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span>Manual Decimal Coordinate Override (Exact Lat / Long)</span>
+          </summary>
+          <div class="loc-manual-body">
+            <div class="loc-manual-inputs-grid">
+              <div class="loc-form-group">
+                <label for="loc-custom-name">STATION / CITY NAME</label>
+                <input type="text" id="loc-custom-name" placeholder="e.g. Salt Lake Sector V, Kolkata" class="loc-text-input">
+              </div>
+              <div class="loc-form-group">
+                <label for="loc-custom-lat">LATITUDE (DECIMAL)</label>
+                <input type="number" step="0.000001" id="loc-custom-lat" placeholder="e.g. 22.572646" class="loc-text-input">
+              </div>
+              <div class="loc-form-group">
+                <label for="loc-custom-lon">LONGITUDE (DECIMAL)</label>
+                <input type="number" step="0.000001" id="loc-custom-lon" placeholder="e.g. 88.363895" class="loc-text-input">
+              </div>
+              <div class="loc-form-group">
+                <label for="loc-custom-alt">ALTITUDE (OPTIONAL)</label>
+                <input type="text" id="loc-custom-alt" placeholder="e.g. 15 m MSL" class="loc-text-input">
+              </div>
+            </div>
+            <button type="button" class="loc-manual-apply-btn" id="loc-custom-apply-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Apply Custom Coordinates</span>
+            </button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status">Feed refreshed</div>
+
+  <!-- RANGER AI COPILOT FLOATING TACTICAL WINDOW -->
+  <aside class="fw-chatbot-window hidden" id="fw-chatbot-window" aria-label="Ranger AI Tactical Copilot">
+    <!-- Header -->
+    <header class="fw-chatbot-header">
+      <div class="fw-chatbot-title-group">
+        <div class="fw-chatbot-status-indicator">
+          <span class="pulse-dot"></span>
+        </div>
+        <div>
+          <div class="fw-chatbot-name">RANGER AI // COPILOT</div>
+          <div class="fw-chatbot-status-sub"><span class="fw-status-badge">LVL-3 TACTICAL</span> &bull; <span>LIVE SENSOR SYNC</span></div>
+        </div>
+      </div>
+      <div class="fw-chatbot-header-actions">
+        <button type="button" class="fw-head-btn" id="fw-chatbot-clear-btn" title="Clear Chat History">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        </button>
+        <button type="button" class="fw-head-btn" id="fw-chatbot-minimize-btn" title="Minimize Chat Window">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button type="button" class="fw-head-btn close-btn" id="fw-chatbot-close-btn" title="Close Assistant">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Quick Prompt Chips -->
+    <nav class="fw-chatbot-chips-bar" id="fw-chatbot-chips" aria-label="Tactical prompt chips">
+      <!-- Populated dynamically by chatbot.js -->
+    </nav>
+
+    <!-- Messages Container -->
+    <div class="fw-chatbot-messages" id="fw-chatbot-messages" role="log" aria-live="polite">
+      <!-- Populated dynamically by chatbot.js -->
+    </div>
+
+    <!-- Footer Form -->
+    <footer class="fw-chatbot-footer">
+      <form id="fw-chatbot-form" class="fw-chatbot-form">
+        <input type="text" id="fw-chatbot-input" class="fw-chatbot-input" placeholder="Ask Ranger AI or type a tactical command..." autocomplete="off" />
+        <button type="button" id="fw-chatbot-mic-btn" class="fw-mic-btn" title="Voice Dictation (Speech-to-Text)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        </button>
+        <button type="submit" id="fw-chatbot-send-btn" class="fw-send-btn" title="Send Message">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </form>
+      <div class="fw-chatbot-microbar">
+        <span>FIELDWATCH TACTICAL AI // OFFLINE READY</span>
+        <span class="fw-kbd-hint">Ctrl + /</span>
+      </div>
+    </footer>
+  </aside>
+
+  <!-- FLOATING CHATBOT TRIGGER BUTTON -->
+  <button type="button" class="fw-chatbot-launcher" id="fw-chatbot-launcher" aria-label="Open Ranger AI Tactical Copilot" title="Open Ranger AI Copilot (Ctrl + /)">
+    <div class="fw-launcher-glow"></div>
+    <div class="fw-launcher-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 8V4H8"></path>
+        <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+        <path d="M2 14h2"></path>
+        <path d="M20 14h2"></path>
+        <path d="M15 13v2"></path>
+        <path d="M9 13v2"></path>
+      </svg>
+    </div>
+    <div class="fw-launcher-pulse"></div>
+    <span class="fw-chatbot-badge" id="fw-chatbot-unread-badge" style="display: none;">0</span>
+  </button>
+
+  <script src="camera-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+
+  <script src="app.js?v=camera-v10"></script>
+  <script src="chatbot.js?v=ranger-v1"></script>
+</body>
+
+</html>
